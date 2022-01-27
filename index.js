@@ -12,23 +12,10 @@ app.get("/", (req, res) => {
 
 app.use('/favicon.ico', express.static('/favicon.ico'));
 
-app.get("/test.json", (req, res) => {
+app.get("/wordList.json", (req, res) => {
 	let arr=[];
-	let temp = fs.readFile("test.json", "utf-8", (err, result) => {
+	let temp = fs.readFile("wordList.json", "utf-8", (err, result) => {
 		let newArr=JSON.parse(result);
 		res.end(JSON.stringify(newArr));
 	});
 })
-
-// const XMLHttpRequest = require('xhr2');
-// fs.readFile("dictionary.json", "utf-8", (err, result) => {
-// 	let arr=[]
-// 	let ogArr = JSON.parse(result);
-// 	let keys= Object.keys(ogArr);
-// 	for (let x=0; x<keys.length; x++) {
-// 		if (keys[x].length==5) {
-// 			arr[arr.length]=keys[x];
-// 		}
-// 	}
-// 	fs.writeFile("dict5.json", JSON.stringify(arr), (err) => {console.log(err)});
-// });

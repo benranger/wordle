@@ -99,8 +99,25 @@
 	let letters="qwertyuiopasdfghjklzxcvbnm";
 	let currentRow=1;
 	let currentLetter=1;
-        
 	let gameOver=false;
+    var answer = "";
+    var data = null;
+    function chooseAnswer() {
+        if (data != null) {
+				answer = data[Math.floor(Math.random()*data.length)];
+        }
+    }
+    function loadData() {
+        let request = new XMLHttpRequest();
+        request.addEventListener("load", function() {
+            if (request.status == 200) {
+                data = JSON.parse(request.responseText);
+                chooseAnswer();
+            }
+        });
+        request.open("GET", "/wordList.json");
+        request.send();
+    }
 	function gameOverCheck() {
 		let gameOver1=true;
 		for (let letter=1; letter<6; letter++) {
@@ -117,60 +134,93 @@
 				}
 			}
 		}
-		document.getElementById(currentRow+"-"+currentLetter).style.backgroundColor="grey";
+		if (currentRow<7 && currentLetter<6) document.getElementById(currentRow+"-"+currentLetter).style.backgroundColor="grey";
 	}
 	updateCursor();
-		function keyDown(name, code) {
-			if (currentRow<7 && gameOver==false) {
-				if (currentLetter<6) {
-					if (letters.includes(name)) {
-						document.getElementById(currentRow+"-"+currentLetter).innerText=name.toUpperCase();
-						currentLetter++;
-						updateCursor();
-					}
-				}
-				if (name=="Backspace" && currentLetter>1) {
-					document.getElementById(currentRow+"-"+(currentLetter-1)).innerText="";
-					currentLetter--;
-					updateCursor();
-				}
-				if (name=="Enter" && currentLetter==6) {
-					gameOver=gameOverCheck();
-					if (gameOver) {
-						document.getElementById("nav").style.color="ForestGreen";
-						//fix cursor
-						for (let row=1; row<7; row++) {
-							for (let column=1; column<6; column++) {
-								let currentSquare=document.getElementById(row+"-"+column);
-								if (currentSquare.style.backgroundColor.toLowerCase()=="grey") {
-									currentSquare.style.backgroundColor="unset";
-								}
-							}
-						}
-					}
-					//word generation
-					//add keyboard
-					//reporting system
-					//word check
-					for (let letter=1; letter<6; letter++) {
-						if (document.getElementById(currentRow+"-"+letter).innerText.toLowerCase()==answer[letter-1].toLowerCase()) {
-							document.getElementById(currentRow+"-"+letter).style.backgroundColor="ForestGreen";
-						}
-						else if (answer.toLowerCase().includes(document.getElementById(currentRow+"-"+letter).innerText.toLowerCase())) {
-							document.getElementById(currentRow+"-"+letter).style.backgroundColor="GoldenRod";
-						}
-					}
-					currentRow++;
-					currentLetter=1;
-					updateCursor();
-				}
-			}
-		}
+        
+    function getLetter(row, column) {
+        return document.getElementById(row+"-"+column).innerText.toLowerCase();
+    }
 
-		document.addEventListener('keydown', (event) => {
-  	var name = event.key;
-  	var code = event.code;
-		if (letters.includes(name) || name=="Backspace" || name=="Enter") keyDown(name, code);
+    let letterPos = [['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', '']];
+
+    // Letter states
+    const FOUND = 3;
+    const BADPLACE = 2;
+    const UNKNOWN = 1;
+
+    let letterStates = new Map(); // char, state
+        
+    function letterState(letter) { // letter state
+        let maybeState = letterStates.get(letter);
+        if (maybeState != undefined) {
+            return maybeState;
+        } else {
+            return UNKNOWN;
+        }
+    }
+        
+    function getRow(row) {
+        let rowLetters = [];
+        for (let column = 1; column <= 5; column++) {
+            rowLetters.push(getLetter(row, column));
+        }
+        return rowLetters.join('').toUpperCase();
+    }
+        
+	function keyDown(name, code) {
+        if (currentRow<7 && gameOver==false) {
+            if (currentLetter<6) {
+                if (letters.includes(name)) {
+                    document.getElementById(currentRow+"-"+currentLetter).innerText=name.toUpperCase();
+                    currentLetter++;
+                    updateCursor();
+                }
+                letterPos[currentRow - 1][currentLetter - 2] = name.toUpperCase().split('')[0];
+            } 
+            if (name=="Backspace" && currentLetter>1) {
+                document.getElementById(currentRow+"-"+(currentLetter-1)).innerText="";
+                currentLetter--;
+                updateCursor();
+            } else if (name=="Enter" && currentLetter==6) {
+                gameOver=gameOverCheck();
+                currentWord=getRow(currentRow);
+                validWord=data.includes(currentWord);
+                if (gameOver) {
+                    document.getElementById("nav").style.color="ForestGreen";
+                    for (let row=1; row<7; row++) {
+                        for (let column=1; column<6; column++) {
+                            let currentSquare=document.getElementById(row+"-"+column);
+                            if (currentSquare.style.backgroundColor.toLowerCase()=="grey") {
+                                currentSquare.style.backgroundColor="unset";
+                            }
+                        }
+                    }
+                } else if (validWord) {
+                    for (let letter=1; letter<6; letter++) {
+                        let letterStr = getLetter(currentRow, letter);
+                        let letterChar = letterStr.split('')[0];
+                    
+                        if (letterStr==answer[letter-1].toLowerCase()) {
+                            document.getElementById(currentRow+"-"+letter).style.backgroundColor="ForestGreen";
+                            letterStates.set(letterChar, FOUND);
+                        } else if (answer.toLowerCase().includes(letterStr)) {
+                            document.getElementById(currentRow+"-"+letter).style.backgroundColor="GoldenRod";
+                            letterStates.set(letterChar, BADPLACE);
+                        }
+                    }
+                    currentRow++;
+                    currentLetter=1;
+                    updateCursor();
+                }
+            }
+        }
+	}
+ 
+	document.addEventListener('keydown', (event) => {
+        var name = event.key;
+  	    var code = event.code;
+		    if (letters.includes(name) || name=="Backspace" || name=="Enter") keyDown(name, code);
 	}, false);
 	</script>
 </body>
