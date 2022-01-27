@@ -59,6 +59,15 @@
 			border-color: --bg;
 			margin-bottom: 5px;
 		}
+        #gameMsg {
+            font-family: sans-serif;
+            color: red;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
 	</style>
 </head>
 <body onload="loadData()" id="body">
@@ -108,6 +117,12 @@
 				<div id="6-5"></div>
 			</div>
 		</div>
+        <div id="gameMsg"></div>
+        <div class="keyboard">
+            <div id="keyboard-1"></div>
+            <div id="keyboard-2"></div>
+            <div id="keyboard-3"></div>
+        </div>
 	</div>
 	<script>
 	let letters="qwertyuiopasdfghjklzxcvbnm";
@@ -116,6 +131,24 @@
 	let gameOver=false;
     var answer = "";
     var data = null;
+
+    //keyboard
+    // let keyboard= ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+    // for (let x=1; x<=3; x++) {
+    //     let currentStr=keyboard[x-1];
+    //     for (let y=0; y<currentStr.length; y++) {
+    //         document.getElementById("keyboard"+x).innerHTML+=("<div id='"+currentStr[y]+"'>"+currentStr[y]+"</div>");
+    //     }
+    // }
+
+    function error() {
+        document.getElementById("nav").style.backgroundColor="unset";
+        document.getElementById("nav").style.backgroundColor="red";
+        setTimeout(() => {
+            document.getElementById("nav").style.backgroundColor="unset";
+        }, 500);
+    }
+
     function chooseAnswer() {
         if (data != null) {
 				answer = data[Math.floor(Math.random()*data.length)];
@@ -194,6 +227,7 @@
     }
         
 	function keyDown(name, code) {
+
         if (currentRow<7 && gameOver==false) {
             let enteredCharacter = name != "Backspace" ? name.toUpperCase().split('')[0] : '';
             if (currentLetter<6) {
@@ -209,6 +243,9 @@
                 currentLetter--;
                 updateCursor();
             } else if (name=="Enter" && currentLetter==6) {
+                if (answer!=getRow(currentRow) &&currentRow>5 && data.includes(getRow(currentRow))) {
+                    document.getElementById("gameMsg").innerText="Game Over! Correct Answer: "+answer;
+                }
                 if (gameOverCheck()) {
                     document.getElementById("nav").style.color="ForestGreen";
                     for (let column=1; column<6; column++) {
@@ -231,6 +268,9 @@
                     currentRow++;
                     currentLetter=1;
                     updateCursor();
+                }
+                else {
+                    error();
                 }
             }
         }
