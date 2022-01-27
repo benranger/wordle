@@ -13,8 +13,7 @@ app.get("/", (req, res) => {
 // app.use(express.favicon(path.join(__dirname,'favicon.ico'))); 
 
 app.get("/wordList.json", (req, res) => {
-	let arr=[];
-	let temp = fs.readFile("wordList.json", "utf-8", (err, result) => {
+	fs.readFile("wordList.json", "utf-8", (err, result) => {
 		let newArr=JSON.parse(result);
 		res.end(JSON.stringify(newArr));
 	});
