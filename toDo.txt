@@ -1,2 +1,3 @@
 add keyboard
 user report word system
+tell user that word is wrong

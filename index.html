@@ -204,7 +204,7 @@
                 }
                 letterPos[currentRow - 1][currentLetter - 2] = enteredCharacter;
             } 
-            if (name=="Backspace" && currentLetter>1) {
+            if (name=="Backspace" && currentLetter>1 && gameOverCheck()==false) {
                 document.getElementById(currentRow+"-"+(currentLetter-1)).innerText="";
                 currentLetter--;
                 updateCursor();
