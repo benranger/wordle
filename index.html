@@ -68,6 +68,27 @@
             align-items: center;
             height: 50px;
         }
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .keyboard div {
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .keyboard div div {
+            width: 40px;
+            height: 50px;
+            padding: 5px;
+            margin: 0px 5px;
+            border: 2px solid black;
+            border-radius: 3px;
+            font-size: 30px;
+            font-family: sans-serif;
+        }
 	</style>
 </head>
 <body onload="loadData()" id="body">
@@ -133,13 +154,14 @@
     var data = null;
 
     //keyboard
-    // let keyboard= ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-    // for (let x=1; x<=3; x++) {
-    //     let currentStr=keyboard[x-1];
-    //     for (let y=0; y<currentStr.length; y++) {
-    //         document.getElementById("keyboard"+x).innerHTML+=("<div id='"+currentStr[y]+"'>"+currentStr[y]+"</div>");
-    //     }
-    // }
+    let keyboard= ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+    for (let x=1; x<=3; x++) {
+        let currentStr=keyboard[x-1];
+        for (let y=0; y<currentStr.length; y++) {
+            let row=document.getElementById("keyboard-"+x)
+            row.innerHTML+=`<div id="${currentStr[y]}">${currentStr[y]}</div>`;
+        }
+    }
 
     function error() {
         document.getElementById("nav").style.backgroundColor="unset";
@@ -225,9 +247,19 @@
         }
         return rowLetters.join('').toUpperCase();
     }
+
+    function greyKey(name) {
+        if (letters.includes(name.toLowerCase())) {
+            let button = document.getElementById(name.toUpperCase());
+            button.style.backgroundColor = "DimGrey";
+            button.style.color="white";
+        }
+    }
         
 	function keyDown(name, code) {
+        
 
+        //game logic
         if (currentRow<7 && gameOver==false) {
             let enteredCharacter = name != "Backspace" ? name.toUpperCase().split('')[0] : '';
             if (currentLetter<6) {
@@ -253,6 +285,7 @@
                         currentSquare.style.backgroundColor="ForestGreen";
                     }
                 } else if (data.includes(getRow(currentRow))) {
+                    //new line
                     for (let letter=1; letter<6; letter++) {
                         let letterStr = getLetter(currentRow, letter);
                         let letterChar = letterStr.split('')[0];
@@ -263,6 +296,9 @@
                         } else if (answer.toLowerCase().includes(letterStr)) {
                             document.getElementById(currentRow+"-"+letter).style.backgroundColor="GoldenRod";
                             letterStates.set(letterChar, BADPLACE);
+                        }
+                        else {
+                            greyKey(letterStr);
                         }
                     }
                     currentRow++;

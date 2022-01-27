@@ -1,3 +1,3 @@
-add keyboard
 favicon
+duplicate letters
 user report word system
