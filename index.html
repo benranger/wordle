@@ -5,14 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Wordle</title>
 	<style>
+        :root {
+            --text: black;
+            --bg: white;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text: white;
+                --bg: grey;
+            }
+        }
 		body {
-			background-color: grey;
+			background-color: --bg;
 		}
 		.content {
 			align-self: center;
 			height: 100%;
-			background-color: #202020;
-			color: white;
+			background-color: --bg;
+			color: --text;
 			padding-bottom: 510px;
 		}
 		.board {
@@ -28,7 +38,9 @@
 			padding: 1px 50px;
 		}
 		.row div {
-			border: 1px solid grey;
+            border-style: solid;
+            border-color: --bg;
+            border-width: 1px;
 			margin: 0 1px;
 			width: 50px;
 			height: 50px;
@@ -42,7 +54,9 @@
 			font-size: 60px;
 			font-weight: bold;
 			font-family: sans-serif;
-			border-bottom: 1px solid grey;
+            border-bottom-style: solid;
+            border-width: 1px;
+			border-color: --bg;
 			margin-bottom: 5px;
 		}
 	</style>
@@ -137,12 +151,23 @@
 		if (currentRow<7 && currentLetter<6) document.getElementById(currentRow+"-"+currentLetter).style.backgroundColor="grey";
 	}
 	updateCursor();
+
+    function getLetterElement(row, column) {
+        return document.getElementById(row+"-"+column);
+    }
         
     function getLetter(row, column) {
-        return document.getElementById(row+"-"+column).innerText.toLowerCase();
+        return getLetterElement(row, column).innerText.toLowerCase();
     }
 
-    let letterPos = [['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', '']];
+    let letterPos = [
+        ['', '', '', '', ''], 
+        ['', '', '', '', ''], 
+        ['', '', '', '', ''], 
+        ['', '', '', '', ''], 
+        ['', '', '', '', ''], 
+        ['', '', '', '', '']
+    ];
 
     // Letter states
     const FOUND = 3;
@@ -170,33 +195,27 @@
         
 	function keyDown(name, code) {
         if (currentRow<7 && gameOver==false) {
+            let enteredCharacter = name != "Backspace" ? name.toUpperCase().split('')[0] : '';
             if (currentLetter<6) {
                 if (letters.includes(name)) {
-                    document.getElementById(currentRow+"-"+currentLetter).innerText=name.toUpperCase();
+                    getLetterElement(currentRow, currentLetter).innerText=name.toUpperCase();
                     currentLetter++;
                     updateCursor();
                 }
-                letterPos[currentRow - 1][currentLetter - 2] = name.toUpperCase().split('')[0];
+                letterPos[currentRow - 1][currentLetter - 2] = enteredCharacter;
             } 
             if (name=="Backspace" && currentLetter>1) {
                 document.getElementById(currentRow+"-"+(currentLetter-1)).innerText="";
                 currentLetter--;
                 updateCursor();
             } else if (name=="Enter" && currentLetter==6) {
-                gameOver=gameOverCheck();
-                currentWord=getRow(currentRow);
-                validWord=data.includes(currentWord);
-                if (gameOver) {
+                if (gameOverCheck()) {
                     document.getElementById("nav").style.color="ForestGreen";
-                    for (let row=1; row<7; row++) {
-                        for (let column=1; column<6; column++) {
-                            let currentSquare=document.getElementById(row+"-"+column);
-                            if (currentSquare.style.backgroundColor.toLowerCase()=="grey") {
-                                currentSquare.style.backgroundColor="unset";
-                            }
-                        }
+                    for (let column=1; column<6; column++) {
+                        let currentSquare=document.getElementById(currentRow+"-"+column);
+                        currentSquare.style.backgroundColor="ForestGreen";
                     }
-                } else if (validWord) {
+                } else if (data.includes(getRow(currentRow))) {
                     for (let letter=1; letter<6; letter++) {
                         let letterStr = getLetter(currentRow, letter);
                         let letterChar = letterStr.split('')[0];
