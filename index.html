@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Wordle</title>
+	<style>
+		body {
+			background-color: grey;
+		}
+		.content {
+			align-self: center;
+			height: 100%;
+			background-color: #202020;
+			color: white;
+			padding-bottom: 510px;
+		}
+		.board {
+			user-select: none;
+			font-weight: bold;
+			font-size: 50px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		.row {
+			display: flex;
+			padding: 1px 50px;
+		}
+		.row div {
+			border: 1px solid grey;
+			margin: 0 1px;
+			width: 50px;
+			height: 50px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		nav {
+			display: flex;
+			justify-content: center;
+			font-size: 60px;
+			font-weight: bold;
+			font-family: sans-serif;
+			border-bottom: 1px solid grey;
+			margin-bottom: 5px;
+		}
+	</style>
+</head>
+<body onload="loadData()" id="body">
+	<div class="content">
+		<nav id="nav">Wordle</nav>
+		<div class="board">
+			<div class="row row-1">
+				<div id="1-1"></div>
+				<div id="1-2"></div>
+				<div id="1-3"></div>
+				<div id="1-4"></div>
+				<div id="1-5"></div>
+			</div>
+			<div class="row row-2">
+				<div id="2-1"></div>
+				<div id="2-2"></div>
+				<div id="2-3"></div>
+				<div id="2-4"></div>
+				<div id="2-5"></div>
+			</div>
+			<div class="row row-3">
+				<div id="3-1"></div>
+				<div id="3-2"></div>
+				<div id="3-3"></div>
+				<div id="3-4"></div>
+				<div id="3-5"></div>
+			</div>
+			<div class="row row-4">
+				<div id="4-1"></div>
+				<div id="4-2"></div>
+				<div id="4-3"></div>
+				<div id="4-4"></div>
+				<div id="4-5"></div>
+			</div>
+			<div class="row row-5">
+				<div id="5-1"></div>
+				<div id="5-2"></div>
+				<div id="5-3"></div>
+				<div id="5-4"></div>
+				<div id="5-5"></div>
+			</div>
+			<div class="row row-6">
+				<div id="6-1"></div>
+				<div id="6-2"></div>
+				<div id="6-3"></div>
+				<div id="6-4"></div>
+				<div id="6-5"></div>
+			</div>
+		</div>
+	</div>
+	<script>
+	let letters="qwertyuiopasdfghjklzxcvbnm";
+	let currentRow=1;
+	let currentLetter=1;
+        
+	let gameOver=false;
+	function gameOverCheck() {
+		let gameOver1=true;
+		for (let letter=1; letter<6; letter++) {
+			if (document.getElementById(currentRow+"-"+letter).innerText.toLowerCase()!=answer[letter-1].toLowerCase()) { gameOver1=false; }
+		}
+		return gameOver1;
+	}
+	function updateCursor() {
+		for (let row=1; row<7; row++) {
+			for (let column=1; column<6; column++) {
+				let currentSquare=document.getElementById(row+"-"+column);
+				if (currentSquare.style.backgroundColor.toLowerCase()=="grey") {
+					currentSquare.style.backgroundColor="unset";
+				}
+			}
+		}
+		document.getElementById(currentRow+"-"+currentLetter).style.backgroundColor="grey";
+	}
+	updateCursor();
+		function keyDown(name, code) {
+			if (currentRow<7 && gameOver==false) {
+				if (currentLetter<6) {
+					if (letters.includes(name)) {
+						document.getElementById(currentRow+"-"+currentLetter).innerText=name.toUpperCase();
+						currentLetter++;
+						updateCursor();
+					}
+				}
+				if (name=="Backspace" && currentLetter>1) {
+					document.getElementById(currentRow+"-"+(currentLetter-1)).innerText="";
+					currentLetter--;
+					updateCursor();
+				}
+				if (name=="Enter" && currentLetter==6) {
+					gameOver=gameOverCheck();
+					if (gameOver) {
+						document.getElementById("nav").style.color="ForestGreen";
+						//fix cursor
+						for (let row=1; row<7; row++) {
+							for (let column=1; column<6; column++) {
+								let currentSquare=document.getElementById(row+"-"+column);
+								if (currentSquare.style.backgroundColor.toLowerCase()=="grey") {
+									currentSquare.style.backgroundColor="unset";
+								}
+							}
+						}
+					}
+					//word generation
+					//add keyboard
+					//reporting system
+					//word check
+					for (let letter=1; letter<6; letter++) {
+						if (document.getElementById(currentRow+"-"+letter).innerText.toLowerCase()==answer[letter-1].toLowerCase()) {
+							document.getElementById(currentRow+"-"+letter).style.backgroundColor="ForestGreen";
+						}
+						else if (answer.toLowerCase().includes(document.getElementById(currentRow+"-"+letter).innerText.toLowerCase())) {
+							document.getElementById(currentRow+"-"+letter).style.backgroundColor="GoldenRod";
+						}
+					}
+					currentRow++;
+					currentLetter=1;
+					updateCursor();
+				}
+			}
+		}
+
+		document.addEventListener('keydown', (event) => {
+  	var name = event.key;
+  	var code = event.code;
+		if (letters.includes(name) || name=="Backspace" || name=="Enter") keyDown(name, code);
+	}, false);
+	</script>
+</body>
+</html>
