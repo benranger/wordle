@@ -1,3 +1,4 @@
 favicon
 duplicate letters
 user report word system
+touch screen

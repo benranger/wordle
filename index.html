@@ -164,11 +164,10 @@
     }
 
     function error() {
-        document.getElementById("nav").style.backgroundColor="unset";
-        document.getElementById("nav").style.backgroundColor="red";
+        document.getElementById("gameMsg").innerText="Not a Word";
         setTimeout(() => {
-            document.getElementById("nav").style.backgroundColor="unset";
-        }, 500);
+            document.getElementById("gameMsg").innerText="";
+        }, 750);
     }
 
     function chooseAnswer() {
